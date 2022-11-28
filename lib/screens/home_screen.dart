@@ -3,7 +3,10 @@
 import 'dart:convert';
 
 import 'package:api_usage/data/api/category_api.dart';
+import 'package:api_usage/data/api/product_api.dart';
 import 'package:api_usage/models/category.dart';
+import 'package:api_usage/models/product.dart';
+import 'package:api_usage/widgets/product_list_widget.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -16,6 +19,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<Category> categories = <Category>[];
   List<Widget> categoryWidgets = [];
+
+  List<Product> products = <Product>[];
 
 
   @override
@@ -38,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
               children: categoryWidgets,
             ),
           ),
-          Text("Merhaba Dünya"),
+          ProductListWidget(products),
         ],
       ),
     );
@@ -64,7 +69,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget createWidget(Category category) {
     return ElevatedButton(onPressed: (){
-
+        getProductsByCategoryId(category);
     }, child: Text(category.categoryName));
   }
+
+  void getProductsByCategoryId(Category category) {
+    ProductApi.getProductsByCategoryId(category.id).then((response) {
+      setState(() {
+        Iterable list = json.decode(response.body);
+        this.products = list.map((product) =>Product.fromJson(product)).toList();
+      });
+    });
+  }
+
+
 }
